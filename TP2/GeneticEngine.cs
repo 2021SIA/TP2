@@ -2,7 +2,7 @@
 
 namespace TP2
 {
-    class Program
+    class GeneticEngine
     {
         static void Main(string[] args)
         {
