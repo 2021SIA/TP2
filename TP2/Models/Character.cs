@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using TP2.Genes;
 
 namespace TP2.Models
 {
@@ -12,18 +14,51 @@ namespace TP2.Models
         }
         public Type CharacterType { get; }
 
+        private IGene[] genes;
+        public ReadOnlySpan<IGene> Genes { get => genes; }
+
         //Gen 1
-        public double Height { get; set; }
+        private HeightGene height;
+        public double Height { get => height.Value; }
         //Gen 2
-        public Item Helmet { get; set; }
+        private ItemGene helmet;
+        public Item Helmet { get => helmet.Value; }
         //Gen 3
-        public Item Chest { get; set; }
+        private ItemGene chest;
+        public Item Chest { get => chest.Value; }
         //Gen 4
-        public Item Gloves { get; set; }
+        private ItemGene gloves;
+        public Item Gloves { get => gloves.Value; }
         //Gen 5
-        public Item Weapon { get; set; }
+        private ItemGene weapon;
+        public Item Weapon { get => weapon.Value; }
         //Gen 6
-        public Item Boots { get; set; }
+        private ItemGene boots;
+        public Item Boots { get => boots.Value; }
+
+        public Character()
+        {
+            height = HeightGene.Random();
+            helmet = ItemGene.Random(Item.Type.HELMET);
+            chest = ItemGene.Random(Item.Type.CHEST);
+            gloves = ItemGene.Random(Item.Type.GLOVES);
+            weapon = ItemGene.Random(Item.Type.WEAPON);
+            boots = ItemGene.Random(Item.Type.BOOTS);
+
+            genes = new IGene[] { height, helmet, chest, gloves, weapon, boots };
+        }
+
+        public Character(IGene[] genes)
+        {
+            this.genes = genes;
+
+            height = (HeightGene)Genes[0];
+            helmet = (ItemGene)Genes[1];
+            chest = (ItemGene)Genes[2];
+            gloves = (ItemGene)Genes[3];
+            weapon = (ItemGene)Genes[4];
+            boots = (ItemGene)Genes[5];
+        }
 
         public double Force
         {

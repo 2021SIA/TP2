@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -19,11 +20,14 @@ namespace TP2.Models
         public double Health { get; }
         public Type ItemType { get; }
 
-        public static ILookup<Type, Item> Items { get; private set; }
+        public static IReadOnlyDictionary<Type, IReadOnlyList<Item>> Items { get; private set; }
 
         public static void LoadItems(IEnumerable<Item> items)
         {
-            Items = items.ToLookup(i => i.ItemType);
+            Items = items
+                .ToLookup(i => i.ItemType)
+                .ToImmutableDictionary( g => g.Key, 
+                                        g => (IReadOnlyList<Item>)g.ToImmutableList());
         }
 
         public Item(int id, double force, double agility, double expertise, double resistance, double health, Type itemType)
