@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TP2.Models
@@ -17,6 +18,13 @@ namespace TP2.Models
         public double Resistance { get; }
         public double Health { get; }
         public Type ItemType { get; }
+
+        public static ILookup<Type, Item> Items { get; private set; }
+
+        public static void LoadItems(IEnumerable<Item> items)
+        {
+            Items = items.ToLookup(i => i.ItemType);
+        }
 
         public Item(int id, double force, double agility, double expertise, double resistance, double health, Type itemType)
         {
