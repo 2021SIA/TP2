@@ -7,7 +7,7 @@ namespace TP2.Selections
 {
     public class TournamentProbSelection : ISelection
     {
-        public ICollection<Character> Select(ICollection<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
         {
             throw new NotImplementedException();
         }

@@ -7,7 +7,7 @@ namespace TP2.Finishers
 {
     public class SolutionFinisher : IFinisher
     {
-        public bool IsFinished(ICollection<Character> population, long generations, long time)
+        public bool IsFinished(IEnumerable<Character> population, long generations, long time)
         {
             throw new NotImplementedException();
         }
