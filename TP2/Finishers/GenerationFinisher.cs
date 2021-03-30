@@ -7,9 +7,14 @@ namespace TP2.Finishers
 {
     public class GenerationFinisher : IFinisher
     {
-        public bool IsFinished(ICollection<Character> population, long generations, long time)
+        private int maxGenerations;
+        public GenerationFinisher(int maxGenerations)
         {
-            throw new NotImplementedException();
+            this.maxGenerations = maxGenerations;
+        }
+        public bool IsFinished(IEnumerable<Character> population, long generations, long time)
+        {
+            return generations >= maxGenerations;
         }
     }
 }
