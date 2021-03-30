@@ -7,6 +7,6 @@ namespace TP2.Finishers
 {
     public interface IFinisher
     {
-        bool IsFinished(ICollection<Character> population, long generations, long time);
+        bool IsFinished(IEnumerable<Character> population, long generations, long time);
     }
 }

@@ -7,6 +7,6 @@ namespace TP2.Replacements
 {
     public interface IReplacement
     {
-        ICollection<Character> GetReplacement(ICollection<Character> population);
+        IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children);
     }
 }
