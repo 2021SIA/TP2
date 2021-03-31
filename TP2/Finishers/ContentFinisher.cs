@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using TP2.Models;
+using System.Linq;
 
 namespace TP2.Finishers
 {
     public class ContentFinisher : IFinisher
     {
-        private int maxGenerations;
+        private long maxGenerations;
         private int currentRepeatGenerations;
-        private int maxFitness;
+        private double maxFitness;
         
         public ContentFinisher()
         {
@@ -23,14 +24,15 @@ namespace TP2.Finishers
 
         public bool IsFinished(IEnumerable<Character> population, long generations, long time)
         {
-            if(NotChangedPopulation(population)
+            List<Character> populationList = population.ToList();
+            if (NotChangedPopulation(populationList))
                 this.currentRepeatGenerations +=1;
             return this.currentRepeatGenerations >= this.maxGenerations;
         }
 
         private bool NotChangedPopulation(List<Character> newPopulation)
         {
-            int currMaxFitness = 0;
+            double currMaxFitness = 0;
             foreach(Character character in newPopulation)
             {
                 if(character.Fitness > currMaxFitness)

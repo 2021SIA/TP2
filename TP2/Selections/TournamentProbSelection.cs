@@ -16,7 +16,8 @@ namespace TP2.Selections
     public class TournamentProbSelection : ISelection
     {
         private static Random rnd = new Random();
-        public ICollection<Character> Select(ICollection<Character> population, int selectionSize) { 
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        {
             int populationSize = population.Count();
             List<Character> populationList = population.ToList();
             double threshold, r;

@@ -15,21 +15,22 @@ namespace TP2.Selections
     public class TournamentDetSelection : ISelection
     {
         private static Random rnd = new Random();
-        public ICollection<Character> Select(ICollection<Character> population, int selectionSize) { 
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize) { 
     
             int populationSize = population.Count();
             List<Character> populationList = population.ToList();
             int M = rnd.Next(populationSize);
-            List<Character> selected = new List<Character>;
+            List<Character> selected = new List<Character>();
             int K = selectionSize;
             List<int> randNum = new List<int>();
             Character topCharacter;
             for(int i = 0; i< K; i++)
             {
                 randNum = GenerateRandom(M, 0, populationSize);
+                topCharacter = populationList[randNum[0]];
                 for(int j=0; j<M; j++)
                 {
-                    if(j=0 || populationList[rendNum[j]].Fitness > topCharacter.Fitness)
+                    if(j == 0 || populationList[randNum[j]].Fitness > topCharacter.Fitness)
                         topCharacter = populationList[randNum[j]];
                 }
                 selected.Add(topCharacter);
