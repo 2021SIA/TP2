@@ -7,9 +7,16 @@ namespace TP2.Finishers
 {
     public class TimeFinisher : IFinisher
     {
+        public TimeFinisher(long timeLimit)
+        {
+            TimeLimit = timeLimit;
+        }
+
+        public long TimeLimit { get; set; }
+
         public bool IsFinished(IEnumerable<Character> population, long generations, long time)
         {
-            throw new NotImplementedException();
+            return time >= TimeLimit;
         }
     }
 }

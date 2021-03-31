@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TP2.Crossovers;
 using TP2.Finishers;
@@ -69,6 +69,9 @@ namespace TP2
                 currentPopulation = AdvanceGeneration(currentPopulation);
                 gen++;
             }
+            sw.Stop();
+            Console.WriteLine($"Advanced {gen} generations in {sw.ElapsedMilliseconds}ms");
+
 
             return currentPopulation;
         }
