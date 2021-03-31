@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TP2.Genes;
 using TP2.Models;
+using System.Linq;
 
 namespace TP2.Crossovers
 {
