@@ -9,15 +9,6 @@ namespace TP2.Selections
     public class UniversalSelection : ISelection
     {
         private static Random rnd = new Random();
-        private IEnumerable<double> CumulativeSum(IEnumerable<double> sequence)
-        {
-            double sum = 0;
-            foreach (var item in sequence)
-            {
-                sum += item;
-                yield return sum;
-            }
-        }
 
         private IEnumerable<double> TargetProb(int k)
         {
@@ -29,7 +20,7 @@ namespace TP2.Selections
         }
 
 
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
             double fitSum = population.Sum(c => c.Fitness);
 

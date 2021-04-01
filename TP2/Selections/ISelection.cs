@@ -7,6 +7,6 @@ namespace TP2.Selections
 {
     public interface ISelection
     {
-        IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize);
+        IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize);
     }
 }

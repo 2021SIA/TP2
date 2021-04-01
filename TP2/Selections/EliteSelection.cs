@@ -8,16 +8,16 @@ namespace TP2.Selections
 {
     public class EliteSelection : ISelection
     {
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int k)
         {
-            var n = population.Count();
+            int N = n;
             var filter = population
                 .OrderByDescending(c => c.Fitness)
-                .Take(selectionSize);
-            if (selectionSize > n)
+                .Take(k);
+            if (k > N)
                 filter = filter
-                    .SelectMany((c, i) => Enumerable.Repeat(c, (int)Math.Ceiling((double)(selectionSize - i) / n)));
-            
+                    .SelectMany((c, i) => Enumerable.Repeat(c, (int)Math.Ceiling((double)(k - i) / N)));
+
             return filter;
         }
     }

@@ -21,10 +21,10 @@ namespace TP2.Replacements
         public IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection)
         {
             if (K > N)
-                return children.Take(N);
+                return selection.Select(children, K, N);
             else
             {
-                return children.Concat(selection.Select(population, N - K));
+                return children.Concat(selection.Select(population, N, N - K));
             }
         }
     }

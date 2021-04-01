@@ -23,7 +23,7 @@ namespace TP2.Selections
             }
             return accumulatedFitness.Last().c;
         }
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
 
             double totalFitness = population.Aggregate(0.0, (total, c) => total + c.Fitness);

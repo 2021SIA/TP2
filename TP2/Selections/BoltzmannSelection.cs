@@ -7,7 +7,7 @@ namespace TP2.Selections
 {
     public class BoltzmannSelection : ISelection
     {
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
             throw new NotImplementedException();
         }

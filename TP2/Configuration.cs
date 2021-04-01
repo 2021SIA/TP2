@@ -96,7 +96,7 @@ namespace TP2
         {
             switch (replacementName)
             {
-                case "fill all": return new FillAll(n);
+                case "fill all": return new FillAll(n, k);
                 case "fill parent": return new FillParent(n, k);
                 default: throw new Exception("Implementación de reemplazo inválida.");
             }
@@ -109,7 +109,7 @@ namespace TP2
                 case "generations": return new GenerationFinisher(configFile.GenerationsLimit);
                 case "acceptable solution": return new SolutionFinisher(configFile.TargetFitness);
                 case "structure": return new StructureFinisher(configFile.StructurePercentage);
-                case "content": return new ContentFinisher();
+                case "content": return new ContentFinisher(configFile.GenerationsLimit);
                 default: throw new Exception("Condicion de corte inválida.");
             }
         }

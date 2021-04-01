@@ -12,25 +12,23 @@ namespace TP2.Finishers
         private int currentRepeatGenerations;
         private double maxFitness;
         
-        public ContentFinisher()
+        public ContentFinisher(long generations)
         {
             this.currentRepeatGenerations = 0;
-        }
-        public void MaxRepeatedGenerations(long generations)
-        {
             this.maxGenerations = generations;
             this.maxFitness = 0;
         }
 
         public bool IsFinished(IEnumerable<Character> population, long generations, long time)
         {
-            List<Character> populationList = population.ToList();
-            if (NotChangedPopulation(populationList))
+            if (NotChangedPopulation(population))
                 this.currentRepeatGenerations +=1;
+            else
+                this.currentRepeatGenerations = 0;
             return this.currentRepeatGenerations >= this.maxGenerations;
         }
 
-        private bool NotChangedPopulation(List<Character> newPopulation)
+        private bool NotChangedPopulation(IEnumerable<Character> newPopulation)
         {
             double currMaxFitness = 0;
             foreach(Character character in newPopulation)
@@ -38,7 +36,7 @@ namespace TP2.Finishers
                 if(character.Fitness > currMaxFitness)
                     currMaxFitness = character.Fitness;
             }
-            if(currMaxFitness != this.maxFitness)
+            if(currMaxFitness > this.maxFitness)
             {
                 this.maxFitness = currMaxFitness;
                 return false;

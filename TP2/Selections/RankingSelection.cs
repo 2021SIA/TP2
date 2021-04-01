@@ -22,7 +22,7 @@ namespace TP2.Selections
             }
             return accumulatedRelativeFitness.Last().c;
         }
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int selectionSize)
+        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
             int populationSize = population.Count();
             List<(Character c, double value)> accumulatedFitness = new List<(Character c, double value)>();

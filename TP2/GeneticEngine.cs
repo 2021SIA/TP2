@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TP2.Crossovers;
 using TP2.Finishers;
@@ -13,7 +13,7 @@ namespace TP2
 {
     class GeneticEngine
     {
-        public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, ISelection replacementSelection, IFinisher finish, int k, double pc)
+        public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, ISelection replacementSelection, IFinisher finish, int n, int k, double pc)
         {
             Crossover = crossover;
             Mutation = mutation;
@@ -21,6 +21,7 @@ namespace TP2
             Replacement = replacement;
             ReplacementSelection = replacementSelection;
             Finish = finish;
+            N = n;
             K = k;
             Pc = pc;
         }
@@ -31,6 +32,7 @@ namespace TP2
         public ISelection ReplacementSelection { get; }
         public IReplacement Replacement { get; }
         public IFinisher Finish { get; }
+        public int N { get; set; }
         public int K { get; set; }
         public double Pc { get; set; }
 
@@ -50,14 +52,11 @@ namespace TP2
 
         IEnumerable<Character> AdvanceGeneration(IEnumerable<Character> population)
         {
-            var parents = ParentSelection.Select(population, K);
-            //var scorePo = population.Average(c => c.Fitness);
-            //var scorePa = parents.Average(c => c.Fitness);
+            var parents = ParentSelection.Select(population, N, K);
             var children = ParentPairings(parents).SelectMany(pair => Crossover.Crossover(pair.c1, pair.c2));
             var mutatedChildren = children.Select(c => Mutation.Mutate(c, Pc));
             var next = Replacement.GetReplacement(population, mutatedChildren, ReplacementSelection);
-            //var scoreRep = next.Average(c => c.Fitness);
-            return next.ToList();
+            return next;
         }
 
         IEnumerable<Character> UntilFinish(IEnumerable<Character> population)
@@ -68,7 +67,7 @@ namespace TP2
             sw.Start();
             while (!Finish.IsFinished(currentPopulation, gen, sw.ElapsedMilliseconds))
             {
-                currentPopulation = AdvanceGeneration(currentPopulation);
+                currentPopulation = AdvanceGeneration(currentPopulation).ToList();
                 gen++;
                 Console.Write("\r" + new string(' ', Console.WindowWidth - 1) + "\r");
                 Console.Write($"Current Generation: {gen}");
@@ -84,7 +83,7 @@ namespace TP2
         {
             if(args.Length == 0)
             {
-                Console.WriteLine("Ingrese el nombre del archivo de configuraci�n.");
+                Console.WriteLine("Ingrese el nombre del archivo de configuración.");
                 return;
             }
             Configuration config;
@@ -108,12 +107,12 @@ namespace TP2
             var replacement = config.ReplacementMethod;
             var finish = config.FinishCondition;
 
-            var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, replacementSelection, finish, k, pc);
+            var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, replacementSelection, finish, n, k, pc);
             var population = Enumerable.Range(0, n).Select(_ => new Character());
-            var initialScore = population.Sum(c => c.Fitness);
+            var initialScore = population.Average(c => c.Fitness);
             Console.WriteLine($"Initial score: {initialScore}");
             var evolved = engine.UntilFinish(population);
-            var finalScore = evolved.Sum(c => c.Fitness);
+            var finalScore = evolved.Average(c => c.Fitness);
             Console.WriteLine($"Final score: {finalScore}");
 
         }

@@ -13,7 +13,7 @@ namespace TP2.Crossovers
         {
             int s = c1.Genes.Length;
             int p = rnd.Next(s);
-            int l = rnd.Next((s / 2) + 1);
+            int l = rnd.Next((s+1) / 2 + 1);
 
             var genes1 = new IGene[s];
             var genes2 = new IGene[s];
