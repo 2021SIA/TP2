@@ -40,5 +40,22 @@ namespace TP2.Models
             this.Health = health;
             this.ItemType = itemType;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (!(obj is Item other))
+            {
+                return false;
+            }
+            return this.Id == other.Id && this.ItemType == other.ItemType;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Id, this.ItemType);
+        }
     }
 }

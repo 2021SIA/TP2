@@ -9,18 +9,16 @@ namespace TP2.Replacements
 {
     public class FillAll : IReplacement
     {
-        public FillAll(int n, ISelection selection)
+        public FillAll(int n)
         {
             N = n;
-            Selection = selection;
         }
 
-        public ISelection Selection { get; }
         public int N { get; }
 
-        public IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children)
+        public IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection)
         {
-            return Selection.Select(children.Concat(population), N);
+            return selection.Select(children.Concat(population), N);
         }
     }
 }

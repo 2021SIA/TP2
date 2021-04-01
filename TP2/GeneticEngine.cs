@@ -13,12 +13,13 @@ namespace TP2
 {
     class GeneticEngine
     {
-        public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, IFinisher finish, int k, double pc)
+        public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, ISelection replacementSelection, IFinisher finish, int k, double pc)
         {
             Crossover = crossover;
             Mutation = mutation;
             ParentSelection = parentSelection;
             Replacement = replacement;
+            ReplacementSelection = replacementSelection;
             Finish = finish;
             K = k;
             Pc = pc;
@@ -27,6 +28,7 @@ namespace TP2
         public ICrossover Crossover { get; }
         public IMutation Mutation { get; }
         public ISelection ParentSelection { get; }
+        public ISelection ReplacementSelection { get; }
         public IReplacement Replacement { get; }
         public IFinisher Finish { get; }
         public int K { get; set; }
@@ -53,7 +55,7 @@ namespace TP2
             //var scorePa = parents.Average(c => c.Fitness);
             var children = ParentPairings(parents).SelectMany(pair => Crossover.Crossover(pair.c1, pair.c2));
             var mutatedChildren = children.Select(c => Mutation.Mutate(c, Pc));
-            var next = Replacement.GetReplacement(population, mutatedChildren);
+            var next = Replacement.GetReplacement(population, mutatedChildren, ReplacementSelection);
             //var scoreRep = next.Average(c => c.Fitness);
             return next.ToList();
         }
@@ -68,36 +70,45 @@ namespace TP2
             {
                 currentPopulation = AdvanceGeneration(currentPopulation);
                 gen++;
+                Console.Write("\r" + new string(' ', Console.WindowWidth - 1) + "\r");
+                Console.Write($"Current Generation: {gen}");
             }
             sw.Stop();
+            Console.WriteLine();
             Console.WriteLine($"Advanced {gen} generations in {sw.ElapsedMilliseconds}ms");
 
 
             return currentPopulation;
         }
-
         static void Main(string[] args)
         {
-            int n = 1000;
-            int k = 200;
-            int gens = 1000;
-            double pc = 0.05;
+            if(args.Length == 0)
+            {
+                Console.WriteLine("Ingrese el nombre del archivo de configuración.");
+                return;
+            }
+            Configuration config;
+            try
+            {
+                config = Configuration.LoadConfiguration(args[0]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
+            int n = config.N;
+            int k = config.K;
+            double pc = config.MutationProbablity;
 
-            var weapons = ItemTSVLoader.Load("Dataset/allitems/armas.tsv", Item.Type.WEAPON);
-            var boots = ItemTSVLoader.Load("Dataset/allitems/botas.tsv", Item.Type.BOOTS);
-            var helmets = ItemTSVLoader.Load("Dataset/allitems/cascos.tsv", Item.Type.HELMET);
-            var gloves = ItemTSVLoader.Load("Dataset/allitems/guantes.tsv", Item.Type.GLOVES);
-            var chests = ItemTSVLoader.Load("Dataset/allitems/pecheras.tsv", Item.Type.CHEST);
-            Item.LoadItems(weapons.Concat(boots).Concat(helmets).Concat(gloves).Concat(chests));
+            var crossover = config.CrossoverMethod;
+            var mutation = config.MutationMethod;
+            var parentSelection = config.Method1;
+            var replacementSelection = config.Method3;
+            var replacement = config.ReplacementMethod;
+            var finish = config.FinishCondition;
 
-            var crossover = new TwoPointCrossover();
-            var mutation = new GeneMutation();
-            var parentSelection = new EliteSelection();
-            var populationSelection = new EliteSelection();
-            var replacement = new FillAll(n, populationSelection);
-            var finish = new GenerationFinisher(gens);
-
-            var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, finish, k, pc);
+            var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, replacementSelection, finish, k, pc);
             var population = Enumerable.Range(0, n).Select(_ => new Character());
             var initialScore = population.Sum(c => c.Fitness);
             Console.WriteLine($"Initial score: {initialScore}");

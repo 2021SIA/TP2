@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TP2": {
+      "commandName": "Project",
+      "commandLineArgs": "config.yaml"
+    }
+  }
+}

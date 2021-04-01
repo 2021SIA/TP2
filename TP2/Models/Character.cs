@@ -110,5 +110,33 @@ namespace TP2.Models
                 }
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if(obj == this)
+            {
+                return true;
+            }
+            if(!(obj is Character other))
+            {
+                return false;
+            }
+            return this.Height == other.Height && 
+                this.Helmet.Equals(other.Helmet) && 
+                this.Chest.Equals(other.Chest) && 
+                this.Weapon.Equals(other.Weapon) && 
+                this.Gloves.Equals(other.Gloves) &&
+                this.Boots.Equals(other.Boots);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                this.Height,
+                this.Helmet.GetHashCode(),
+                this.Chest.GetHashCode(),
+                this.Weapon.GetHashCode(),
+                this.Gloves.GetHashCode(),
+                this.Boots.GetHashCode());
+        }
     }
 }
