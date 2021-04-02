@@ -24,7 +24,7 @@ namespace TP2.Finishers
             if (NotChangedPopulation(population))
                 this.currentRepeatGenerations +=1;
             else
-                this.currentRepeatGenerations = 0;
+                this.currentRepeatGenerations = 1;
             return this.currentRepeatGenerations >= this.maxGenerations;
         }
 
