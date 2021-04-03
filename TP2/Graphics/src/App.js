@@ -100,7 +100,8 @@ class App extends React.Component {
         data: this.storedMinFitness
       }],
       xaxis: {
-        max:500
+        max:500,
+        range:500
       }
     },true);
     fetch('http://localhost:5000/start', requestOptions)
@@ -108,7 +109,7 @@ class App extends React.Component {
         let intervalId = window.setInterval(() => {
           fetch('http://localhost:5000/data')
             .then(response => response.json())
-            .then(data => {
+              .then(data => {
               if(data.length > 0 && data[data.length - 1] === null){
                 window.clearInterval(intervalId);
                 this.setState({started:false});
@@ -135,10 +136,11 @@ class App extends React.Component {
                   name:"Fitness Minimo",
                   data: this.storedMinFitness
               }],true);
-              if((this.storedAvgFitness.length) >= 500){
+              if(this.storedAvgFitness.length >= 500){
                 ApexCharts.exec('realtime', 'updateOptions', {
                   xaxis:{
-                    max:this.storedAvgFitness.length + 20
+                        max: this.storedAvgFitness.length + 20,
+                        range: this.storedAvgFitness.length + 20
                   }
                 },true);
               }

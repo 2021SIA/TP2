@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -81,7 +82,16 @@ namespace TP2
                     var engineThread = new Thread(() =>
                     {
                         metricsBuffer = new BufferBlock<GenerationMetrics>();
-                        engine.UntilFinish(population, MeasureGenerationMetrics);
+                        int gen = 0;
+                        var currentPopulation = population;
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
+                        while (!engine.Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
+                        {
+                            currentPopulation = engine.AdvanceGeneration(currentPopulation).ToList();
+                            MeasureGenerationMetrics(currentPopulation);
+                        }
+                        sw.Stop();
                         metricsBuffer.Post(null);
                         metricsBuffer.Complete();
                     });

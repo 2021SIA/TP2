@@ -14,8 +14,6 @@ namespace TP2
 {
     public class GeneticEngine
     {
-        public delegate void GenerationMetricsHandler(IEnumerable<Character> generation);
-
         public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, ISelection replacementSelection, IFinisher finish, int n, int k, double pc)
         {
             Crossover = crossover;
@@ -52,7 +50,7 @@ namespace TP2
             while (iter.MoveNext());
         }
 
-        IEnumerable<Character> AdvanceGeneration(IEnumerable<Character> population)
+        public IEnumerable<Character> AdvanceGeneration(IEnumerable<Character> population)
         {
             var parents = ParentSelection.Select(population, N, K);
             var children = ParentPairings(parents).SelectMany(pair => Crossover.Crossover(pair.c1, pair.c2));
@@ -77,22 +75,6 @@ namespace TP2
             sw.Stop();
             Console.WriteLine();
             Console.WriteLine($"Advanced {gen} generations in {sw.ElapsedMilliseconds}ms");
-
-
-            return currentPopulation;
-        }
-        public IEnumerable<Character> UntilFinish(IEnumerable<Character> population, GenerationMetricsHandler metrics)
-        {
-            int gen = 0;
-            var currentPopulation = population;
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            while (!Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
-            {
-                currentPopulation = AdvanceGeneration(currentPopulation).ToList();
-                metrics(currentPopulation);
-            }
-            sw.Stop();
 
 
             return currentPopulation;
