@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TP2.Crossovers;
 using TP2.Finishers;
@@ -89,7 +89,7 @@ namespace TP2
             sw.Start();
             while (!Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
             {
-                currentPopulation = AdvanceGeneration(currentPopulation);
+                currentPopulation = AdvanceGeneration(currentPopulation).ToList();
                 metrics(currentPopulation);
             }
             sw.Stop();
@@ -101,7 +101,7 @@ namespace TP2
         /// Genetic Algorithms Engine
         /// </summary>
         /// <param name="config">Configuration file path</param>
-        /// <param name="server">Flag to run engine as web server</param>
+        /// <param name="listen">Flag to run engine as web server</param>
         static void Main(string config, bool listen)
         {
             if(config.Length == 0)

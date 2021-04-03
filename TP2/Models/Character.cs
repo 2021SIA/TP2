@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using TP2.Genes;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TP2.Models
 {
-    public class Character
+    public class Character : IComparable<Character>
     {
         public enum Type
         {
@@ -52,12 +53,12 @@ namespace TP2.Models
         {
             this.genes = genes;
 
-            height = (HeightGene)Genes[0];
-            helmet = (ItemGene)Genes[1];
-            chest = (ItemGene)Genes[2];
-            gloves = (ItemGene)Genes[3];
-            weapon = (ItemGene)Genes[4];
-            boots = (ItemGene)Genes[5];
+            height = (HeightGene)genes[0];
+            helmet = (ItemGene)genes[1];
+            chest = (ItemGene)genes[2];
+            gloves = (ItemGene)genes[3];
+            weapon = (ItemGene)genes[4];
+            boots = (ItemGene)genes[5];
         }
 
         public double Force
@@ -96,16 +97,20 @@ namespace TP2.Models
         {
             get => (Resistance + Expertise) * Health * DEM;
         }
+
+        private double fitness = double.NaN;
         public double Fitness
         {
             get
             {
+                if (!double.IsNaN(fitness))
+                    return fitness;
                 switch (CharacterType)
                 {
-                    case Type.WARRIOR: return 0.6 * Attack + 0.6 * Defense;
-                    case Type.ARCHER: return 0.9 * Attack + 0.1 * Defense;
-                    case Type.DEFENDER: return 0.3 * Attack + 0.8 * Defense;
-                    case Type.ROGUE: return 0.8 * Attack + 0.3 * Defense;
+                    case Type.WARRIOR: return fitness = 0.6 * Attack + 0.6 * Defense;
+                    case Type.ARCHER: return fitness = 0.9 * Attack + 0.1 * Defense;
+                    case Type.DEFENDER: return fitness = 0.3 * Attack + 0.8 * Defense;
+                    case Type.ROGUE: return fitness = 0.8 * Attack + 0.3 * Defense;
                     default: return -1;
                 }
             }
@@ -137,6 +142,11 @@ namespace TP2.Models
                 this.Weapon.GetHashCode(),
                 this.Gloves.GetHashCode(),
                 this.Boots.GetHashCode());
+        }
+
+        public int CompareTo([AllowNull] Character other)
+        {
+            return Fitness.CompareTo(other.Fitness);
         }
     }
 }
