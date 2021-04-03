@@ -41,6 +41,7 @@ namespace TP2
             public int GenerationsLimit { get; set; } = -1;
             public double TargetFitness { get; set; } = -1;
             public double StructurePercentage { get; set; } = -1;
+            public int TournamentM { get; set; } = -1;
         }
         public ISelection Method1 { get; }
         public ISelection Method2 { get; }
@@ -56,7 +57,7 @@ namespace TP2
         public Character.Type CharacterType { get; }
         public int N { get; }
         public int K { get; }
-        private static ISelection GetSelection(string selectionName)
+        private static ISelection GetSelection(string selectionName, ConfigurationFile configFile)
         {
             switch (selectionName)
             {
@@ -64,7 +65,7 @@ namespace TP2
                 case "roulette": return new RouletteSelection();
                 case "ranking": return new RankingSelection();
                 case "boltzmann": return new BoltzmannSelection();
-                case "tournament det": return new TournamentDetSelection();
+                case "tournament det": return new TournamentDetSelection(configFile.TournamentM);
                 case "tournament prob": return new TournamentProbSelection();
                 case "universal": return new UniversalSelection();
                 default: throw new Exception("Método de selección inválido.");
@@ -130,10 +131,10 @@ namespace TP2
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
             ConfigurationFile configFile = deserializer.Deserialize<ConfigurationFile>(File.OpenText(path));
-            ISelection method1 = GetSelection(configFile.Method1),
-                method2 = GetSelection(configFile.Method2),
-                method3 = GetSelection(configFile.Method3),
-                method4 = GetSelection(configFile.Method4);
+            ISelection method1 = GetSelection(configFile.Method1, configFile),
+                method2 = GetSelection(configFile.Method2, configFile),
+                method3 = GetSelection(configFile.Method3, configFile),
+                method4 = GetSelection(configFile.Method4, configFile);
             ICrossover crossover = GetCrossover(configFile.CrossoverMethod);
             IMutation mutation = GetMutation(configFile.MutationMethod);
             IReplacement replacement = GetReplacement(configFile.ReplacementMethod,configFile.N,configFile.K);

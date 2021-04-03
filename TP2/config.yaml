@@ -4,6 +4,7 @@ method1: elite
 method2: roulette
 method3: ranking
 method4: tournament det
+tournament_m: 3
 a: 0.7
 b: 0.3
 crossover_method: one point

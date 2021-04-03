@@ -8,11 +8,14 @@ using TP2.Replacements;
 using TP2.Selections;
 using System.Linq;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace TP2
 {
-    class GeneticEngine
+    public class GeneticEngine
     {
+        public delegate void GenerationMetricsHandler(IEnumerable<Character> generation);
+
         public GeneticEngine(ICrossover crossover, IMutation mutation, ISelection parentSelection, IReplacement replacement, ISelection replacementSelection, IFinisher finish, int n, int k, double pc)
         {
             Crossover = crossover;
@@ -25,7 +28,6 @@ namespace TP2
             K = k;
             Pc = pc;
         }
-
         public ICrossover Crossover { get; }
         public IMutation Mutation { get; }
         public ISelection ParentSelection { get; }
@@ -59,7 +61,7 @@ namespace TP2
             return next;
         }
 
-        IEnumerable<Character> UntilFinish(IEnumerable<Character> population)
+        public IEnumerable<Character> UntilFinish(IEnumerable<Character> population)
         {
             int gen = 0;
             Stopwatch sw = new Stopwatch();
@@ -79,41 +81,70 @@ namespace TP2
 
             return currentPopulation;
         }
-        static void Main(string[] args)
+        public IEnumerable<Character> UntilFinish(IEnumerable<Character> population, GenerationMetricsHandler metrics)
         {
-            if(args.Length == 0)
+            int gen = 0;
+            var currentPopulation = population;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (!Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
             {
-                Console.WriteLine("Ingrese el nombre del archivo de configuración.");
+                currentPopulation = AdvanceGeneration(currentPopulation);
+                metrics(currentPopulation);
+            }
+            sw.Stop();
+
+
+            return currentPopulation;
+        }
+        /// <summary>
+        /// Genetic Algorithms Engine
+        /// </summary>
+        /// <param name="config">Configuration file path</param>
+        /// <param name="server">Flag to run engine as web server</param>
+        static void Main(string config, bool listen)
+        {
+            if(config.Length == 0)
+            {
+                Console.WriteLine("Ingrese el nombre del archivo de configuraci�n.");
                 return;
             }
-            Configuration config;
+            Configuration configuration;
             try
             {
-                config = Configuration.LoadConfiguration(args[0]);
+                configuration = Configuration.LoadConfiguration(config);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return;
             }
-            int n = config.N;
-            int k = config.K;
-            double pc = config.MutationProbablity;
-
-            var crossover = config.CrossoverMethod;
-            var mutation = config.MutationMethod;
-            var parentSelection = config.Method1;
-            var replacementSelection = config.Method3;
-            var replacement = config.ReplacementMethod;
-            var finish = config.FinishCondition;
-
+            int n = configuration.N;
+            int k = configuration.K;
+            double pc = configuration.MutationProbablity;
+            var crossover = configuration.CrossoverMethod;
+            var mutation = configuration.MutationMethod;
+            var parentSelection = configuration.Method1;
+            var replacementSelection = configuration.Method3;
+            var replacement = configuration.ReplacementMethod;
+            var finish = configuration.FinishCondition;
             var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, replacementSelection, finish, n, k, pc);
-            var population = Enumerable.Range(0, n).Select(_ => new Character());
-            var initialScore = population.Average(c => c.Fitness);
-            Console.WriteLine($"Initial score: {initialScore}");
-            var evolved = engine.UntilFinish(population);
-            var finalScore = evolved.Average(c => c.Fitness);
-            Console.WriteLine($"Final score: {finalScore}");
+
+            if (listen)
+            {
+                GeneticEngineServer engineServer = new GeneticEngineServer("http://localhost:5000/");
+                Task listenTask = engineServer.HandleIncomingConnections(engine);
+                listenTask.GetAwaiter().GetResult();
+            }
+            else
+            {
+                var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
+                var initialScore = population.Sum(c => c.Fitness);
+                Console.WriteLine($"Initial score: {initialScore}");
+                var evolved = engine.UntilFinish(population);
+                var finalScore = evolved.Sum(c => c.Fitness);
+                Console.WriteLine($"Final score: {finalScore}");
+            }
 
         }
     }

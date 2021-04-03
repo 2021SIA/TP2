@@ -29,10 +29,10 @@ namespace TP2.Selections
             for(int i=0; i<K ; i++)
             { 
                 randNum = GenerateRandom(2,0,populationSize);
-                threshold = ( rnd.Next(4) + 6 ) / 10;
+                threshold = rnd.NextDouble() / 2 + 0.5;
                 character1 = populationList[randNum[0]];
-                character2 = populationList[randNum[1]]; 
-                r = rnd.Next(11)/10;
+                character2 = populationList[randNum[1]];
+                r = rnd.NextDouble();
                 if(r < threshold)
                     selected.Add(character1.Fitness > character2.Fitness ? character1 : character2);
                 else
