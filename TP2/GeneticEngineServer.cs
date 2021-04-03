@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -17,14 +19,13 @@ namespace TP2
 
         private class GenerationMetrics
         {
-            [JsonPropertyName("avgFitness")]
             public double AvgFitness { get; set; }
 
-            [JsonPropertyName("minFitness")]
             public double MinFitness { get; set; }
 
-            [JsonPropertyName("maxFitness")]
             public double MaxFitness { get; set; }
+
+            public Character BestCharacter { get; set; }
             public GenerationMetrics() { }
         }
         private HttpListener listener;
@@ -39,20 +40,23 @@ namespace TP2
         private void MeasureGenerationMetrics(IEnumerable<Character> generation)
         {
             double avgFitness = 0, minFitness = double.MaxValue, maxFitness = 0;
+            Character bestCharacter = generation.First();
             foreach(Character c in generation)
             {
                 avgFitness += c.Fitness;
                 minFitness = c.Fitness < minFitness ? c.Fitness : minFitness;
                 maxFitness = c.Fitness > maxFitness ? c.Fitness : maxFitness;
+                bestCharacter = c.Fitness > bestCharacter.Fitness ? c : bestCharacter;
             }
             avgFitness /= generation.Count();
             metricsBuffer.Post(new GenerationMetrics() { 
                 AvgFitness = avgFitness,
                 MinFitness = minFitness,
-                MaxFitness = maxFitness
+                MaxFitness = maxFitness,
+                BestCharacter = bestCharacter
             });
         }
-        public async Task HandleIncomingConnections(GeneticEngine engine)
+        public async Task HandleIncomingConnections()
         {
             bool runServer = true;
             // Create a Http server and start listening for incoming connections
@@ -77,26 +81,46 @@ namespace TP2
                 }
                 else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/start"))
                 {
+
                     //Start
-                    var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
-                    var engineThread = new Thread(() =>
+                    string jsonConfiguration;
+                    using (var reader = new StreamReader(req.InputStream, req.ContentEncoding))
                     {
-                        metricsBuffer = new BufferBlock<GenerationMetrics>();
-                        int gen = 0;
-                        var currentPopulation = population;
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        while (!engine.Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
+                        jsonConfiguration = reader.ReadToEnd();
+                    }
+                    try
+                    {
+                        Configuration config = Configuration.FromJson(jsonConfiguration);
+                        GeneticEngine engine = new GeneticEngine(config);
+                        var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
+                        var engineThread = new Thread(() =>
                         {
-                            currentPopulation = engine.AdvanceGeneration(currentPopulation).ToList();
-                            MeasureGenerationMetrics(currentPopulation);
-                        }
-                        sw.Stop();
-                        metricsBuffer.Post(null);
-                        metricsBuffer.Complete();
-                    });
-                    engineThread.Start();
-                    resp.StatusCode = 204;
+                            metricsBuffer = new BufferBlock<GenerationMetrics>();
+                            int gen = 0;
+                            var currentPopulation = population;
+                            Stopwatch sw = new Stopwatch();
+                            sw.Start();
+                            while (!engine.Finish.IsFinished(currentPopulation, gen++, sw.ElapsedMilliseconds))
+                            {
+                                currentPopulation = engine.AdvanceGeneration(currentPopulation).ToList();
+                                MeasureGenerationMetrics(currentPopulation);
+                            }
+                            sw.Stop();
+                            metricsBuffer.Post(null);
+                            metricsBuffer.Complete();
+                        });
+                        engineThread.Start();
+                        resp.StatusCode = 204;
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        byte[] responseData = Encoding.UTF8.GetBytes(ex.ToString());
+                        resp.StatusCode = 400;
+                        resp.ContentEncoding = Encoding.UTF8;
+                        resp.ContentLength64 = responseData.LongLength;
+                        await resp.OutputStream.WriteAsync(responseData,0,responseData.Length);
+                    }
                 }
                 else if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/data"))
                 {
@@ -106,7 +130,12 @@ namespace TP2
                     {
                         values.Add(data);
                     }
-                    byte[] responseData = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(values);
+                    byte[] responseData = Encoding.UTF8.GetBytes(
+                            JsonConvert.SerializeObject(values,Formatting.None, new JsonSerializerSettings
+                            {
+                                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                            })
+                        );
                     resp.ContentType = "application/json";
                     resp.ContentEncoding = Encoding.UTF8;
                     resp.ContentLength64 = responseData.LongLength;

@@ -1,21 +1,15 @@
 n: 1000
-k: 1000
+k: 500
 method1: elite
-method2: roulette
-method3: ranking
-method4: tournament det
-tournament_m: 3
+method2: ranking
+method3: roulette
+method4: universal
 a: 0.7
 b: 0.3
 crossover_method: one point
-mutation_method: multigene uniform
-mutation_probability: 0.4
+mutation_method: gene
+mutation_probability: 0.05
 replacement_method: fill all
 character_type: warrior
 finish: generations
 generations_limit: 1000
-weapons: Dataset/allitems/armas.tsv
-helmets: Dataset/allitems/cascos.tsv
-chests: Dataset/allitems/pecheras.tsv
-gloves: Dataset/allitems/guantes.tsv
-boots: Dataset/allitems/botas.tsv

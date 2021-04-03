@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using TP2.Crossovers;
 using TP2.Finishers;
 using TP2.Models;
@@ -37,11 +35,11 @@ namespace TP2
             public string Chests { get; set; }
             public string Gloves { get; set; }
             public string Boots { get; set; }
-            public int TimeLimit { get; set; } = -1;
-            public int GenerationsLimit { get; set; } = -1;
-            public double TargetFitness { get; set; } = -1;
-            public double StructurePercentage { get; set; } = -1;
-            public int TournamentM { get; set; } = -1;
+            public int? TimeLimit { get; set; } = null;
+            public int? GenerationsLimit { get; set; } = null;
+            public double? TargetFitness { get; set; } = null;
+            public double? StructurePercentage { get; set; } = null;
+            public int? TournamentM { get; set; } = null;
         }
         public ISelection Method1 { get; }
         public ISelection Method2 { get; }
@@ -65,7 +63,7 @@ namespace TP2
                 case "roulette": return new RouletteSelection();
                 case "ranking": return new RankingSelection();
                 case "boltzmann": return new BoltzmannSelection();
-                case "tournament det": return new TournamentDetSelection(configFile.TournamentM);
+                case "tournament det": return new TournamentDetSelection(configFile.TournamentM.Value);
                 case "tournament prob": return new TournamentProbSelection();
                 case "universal": return new UniversalSelection();
                 default: throw new Exception("Método de selección inválido.");
@@ -106,11 +104,11 @@ namespace TP2
         {
             switch (finisherName)
             {
-                case "time": return new TimeFinisher(configFile.TimeLimit);
-                case "generations": return new GenerationFinisher(configFile.GenerationsLimit);
-                case "acceptable solution": return new SolutionFinisher(configFile.TargetFitness);
-                case "structure": return new StructureFinisher(configFile.StructurePercentage);
-                case "content": return new ContentFinisher(configFile.GenerationsLimit);
+                case "time": return new TimeFinisher(configFile.TimeLimit.Value);
+                case "generations": return new GenerationFinisher(configFile.GenerationsLimit.Value);
+                case "acceptable solution": return new SolutionFinisher(configFile.TargetFitness.Value);
+                case "structure": return new StructureFinisher(configFile.StructurePercentage.Value);
+                case "content": return new ContentFinisher(configFile.GenerationsLimit.Value);
                 default: throw new Exception("Condicion de corte inválida.");
             }
         }
@@ -125,31 +123,32 @@ namespace TP2
                 default: throw new Exception("Tipo de personaje inválido.");
             }
         }
-        public static Configuration LoadConfiguration(string path)
+        private static Configuration LoadConfiguration(ConfigurationFile configFile)
         {
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
-            ConfigurationFile configFile = deserializer.Deserialize<ConfigurationFile>(File.OpenText(path));
             ISelection method1 = GetSelection(configFile.Method1, configFile),
                 method2 = GetSelection(configFile.Method2, configFile),
                 method3 = GetSelection(configFile.Method3, configFile),
                 method4 = GetSelection(configFile.Method4, configFile);
             ICrossover crossover = GetCrossover(configFile.CrossoverMethod);
             IMutation mutation = GetMutation(configFile.MutationMethod);
-            IReplacement replacement = GetReplacement(configFile.ReplacementMethod,configFile.N,configFile.K);
+            IReplacement replacement = GetReplacement(configFile.ReplacementMethod, configFile.N, configFile.K);
             Character.Type type = GetCharacterType(configFile.CharacterType);
             IFinisher finisher = GetFinisher(configFile.Finish, configFile);
-            Console.WriteLine("Loading dataset...");
-            var weapons = ItemTSVLoader.Load(configFile.Weapons, Item.Type.WEAPON);
-            var boots = ItemTSVLoader.Load(configFile.Boots, Item.Type.BOOTS);
-            var helmets = ItemTSVLoader.Load(configFile.Helmets, Item.Type.HELMET);
-            var gloves = ItemTSVLoader.Load(configFile.Gloves, Item.Type.GLOVES);
-            var chests = ItemTSVLoader.Load(configFile.Chests, Item.Type.CHEST);
-            Item.LoadItems(weapons.Concat(boots).Concat(helmets).Concat(gloves).Concat(chests));
-            Console.WriteLine("Dataset Loaded.");
-            return new Configuration(configFile.N,configFile.K,configFile.A,configFile.B,method1,method2,method3,method4,
-                crossover,mutation,configFile.MutationProbability,replacement, finisher, type);
+            return new Configuration(configFile.N, configFile.K, configFile.A, configFile.B, method1, method2, method3, method4,
+                crossover, mutation, configFile.MutationProbability, replacement, finisher, type);
+        }
+        public static Configuration FromJson(string json)
+        {
+            ConfigurationFile configFile = JsonConvert.DeserializeObject<ConfigurationFile>(json);
+            return LoadConfiguration(configFile);
+        }
+        public static Configuration FromYamlFile(string path)
+        {
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build();
+            ConfigurationFile configFile = deserializer.Deserialize<ConfigurationFile>(File.OpenText(path));
+            return LoadConfiguration(configFile);
         }
         private Configuration() { }
         private Configuration(int n, int k, double a, double b,

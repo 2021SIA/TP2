@@ -8,7 +8,6 @@
   padding-right: 3%;
   padding-left: 3%;
   margin-top:2%;
-  margin-bottom:2%;
   border-radius: 32px;
   border: 0px;
   background-color:#00bfff;
@@ -18,6 +17,37 @@ button:disabled,
 button[disabled]{
   border: 1px solid #999999;
   background-color: #00bfff80;
+}
+.configuration-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom:16px
+}
+.configuration-item {
+    margin-left: 1%;
+}
+.configuration-label {
+    margin-right: 8px;
+}
+.character-data{
+    display:flex;
+    justify-content:center;
+    margin-bottom:40px
+}
+.character-item {
+    border: 2px solid lightskyblue;
+    border-radius: 16px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-right: 28px;
+    padding-left: 28px;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+.item-stat {
+    display:flex;
+    justify-content:center;
+    margin-top:8px;
 }
 .start-button-container {
   height:15vh;

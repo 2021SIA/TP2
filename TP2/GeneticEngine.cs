@@ -9,6 +9,7 @@ using TP2.Selections;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TP2
 {
@@ -25,6 +26,18 @@ namespace TP2
             N = n;
             K = k;
             Pc = pc;
+        }
+        public GeneticEngine(Configuration config)
+        {
+            N = config.N;
+            K = config.K;
+            Pc = config.MutationProbablity;
+            Crossover = config.CrossoverMethod;
+            Mutation = config.MutationMethod;
+            ParentSelection = config.Method1;
+            ReplacementSelection = config.Method3;
+            Replacement = config.ReplacementMethod;
+            Finish = config.FinishCondition;
         }
         public ICrossover Crossover { get; }
         public IMutation Mutation { get; }
@@ -82,44 +95,47 @@ namespace TP2
         /// <summary>
         /// Genetic Algorithms Engine
         /// </summary>
-        /// <param name="config">Configuration file path</param>
+        /// <param name="config">Configuration yaml file path</param>
         /// <param name="listen">Flag to run engine as web server</param>
-        static void Main(string config, bool listen)
+        static void Main(string config, string dataset, bool listen)
         {
-            if(config.Length == 0)
+            if(dataset.Length == 0)
+            {
+                Console.WriteLine("Ingrese el nombre del directorio conteniendo el dataset.");
+                return;
+            }
+            if(config.Length == 0 && !listen)
             {
                 Console.WriteLine("Ingrese el nombre del archivo de configuraci�n.");
                 return;
             }
-            Configuration configuration;
-            try
-            {
-                configuration = Configuration.LoadConfiguration(config);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return;
-            }
-            int n = configuration.N;
-            int k = configuration.K;
-            double pc = configuration.MutationProbablity;
-            var crossover = configuration.CrossoverMethod;
-            var mutation = configuration.MutationMethod;
-            var parentSelection = configuration.Method1;
-            var replacementSelection = configuration.Method3;
-            var replacement = configuration.ReplacementMethod;
-            var finish = configuration.FinishCondition;
-            var engine = new GeneticEngine(crossover, mutation, parentSelection, replacement, replacementSelection, finish, n, k, pc);
-
+            Console.WriteLine("Loading dataset...");
+            var weapons = ItemTSVLoader.Load(Path.Join(dataset,"armas.tsv"), Item.Type.WEAPON);
+            var boots = ItemTSVLoader.Load(Path.Join(dataset, "botas.tsv"), Item.Type.BOOTS);
+            var helmets = ItemTSVLoader.Load(Path.Join(dataset, "cascos.tsv"), Item.Type.HELMET);
+            var gloves = ItemTSVLoader.Load(Path.Join(dataset, "guantes.tsv"), Item.Type.GLOVES);
+            var chests = ItemTSVLoader.Load(Path.Join(dataset, "pecheras.tsv"), Item.Type.CHEST);
+            Item.LoadItems(weapons.Concat(boots).Concat(helmets).Concat(gloves).Concat(chests));
+            Console.WriteLine("Dataset Loaded.");
             if (listen)
             {
                 GeneticEngineServer engineServer = new GeneticEngineServer("http://localhost:5000/");
-                Task listenTask = engineServer.HandleIncomingConnections(engine);
+                Task listenTask = engineServer.HandleIncomingConnections();
                 listenTask.GetAwaiter().GetResult();
             }
             else
             {
+                Configuration configuration;
+                try
+                {
+                    configuration = Configuration.FromYamlFile(config);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return;
+                }
+                var engine = new GeneticEngine(configuration);
                 var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
                 var initialScore = population.Sum(c => c.Fitness);
                 Console.WriteLine($"Initial score: {initialScore}");
