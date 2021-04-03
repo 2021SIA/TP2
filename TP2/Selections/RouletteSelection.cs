@@ -8,40 +8,44 @@ namespace TP2.Selections
 {
     public class RouletteSelection : ISelection
     {
-        private static Random rnd = new Random();
+        protected static Random random = new Random();
 
-        private Character getCharacter(IEnumerable<(Character c, double value)> accumulatedFitness, double num)
+        protected virtual IEnumerable<double> TargetProb(int k)
         {
-            var previous = 0.0;
-            foreach ((Character c, double value) in accumulatedFitness)
+            for (int j = 0; j < k; j++)
             {
-                if (num > previous && num < value)
-                {
-                    return c;
-                }
-                previous = value;
+                double r = random.NextDouble();
+                yield return r;
             }
-            return accumulatedFitness.Last().c;
         }
-        public IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
+
+
+        public virtual IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
+            var collection = population.ToArray();
+            double sum = collection.Sum(c => c.Fitness);
+            return Roulette(collection, selectionSize, (i, c) => c.Fitness, sum);
+        }
 
-            double totalFitness = population.Aggregate(0.0, (total, c) => total + c.Fitness);
+        protected IEnumerable<Character> Roulette(IEnumerable<Character> population, int selectionSize, Func<int,Character,double> Fitness, double fitnessSum)
+        {
+            var targets = TargetProb(selectionSize).ToArray();
+            Array.Sort(targets);
 
-            List<(Character c, double value)> accumulatedRelativeFitness = new List<(Character c, double value)>();
-            population.Aggregate(0.0, (accum, c) =>
+            double accum = 0;
+            int i = 1, j = 0;
+            foreach (var c in population)
             {
-                double value = accum + (c.Fitness / totalFitness);
-                accumulatedRelativeFitness.Add((c,value));
-                return value;
-            });
-
-            List<Character> newPopulation = new List<Character>();
-            for (var i = 0; i < selectionSize; i++)
-            {
-                newPopulation.Add(getCharacter(accumulatedRelativeFitness, rnd.NextDouble()));
+                accum += Fitness(i, c) / fitnessSum;
+                if (accum >= targets[j])
+                {
+                    j++;
+                    yield return c;
+                }
+                if (j == selectionSize)
+                    break;
+                i++;
             }
-            return newPopulation;
         }
     }
 }
