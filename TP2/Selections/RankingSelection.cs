@@ -12,7 +12,7 @@ namespace TP2.Selections
         {
             var population = p.OrderByDescending(c => c.Fitness);
             double sum = (n - 1) / 2;
-            return Roulette(population, selectionSize, (i, c) => ((double)(n - i) / n), sum);
+            return Roulette(population, n, selectionSize, (i, c) => ((double)(n - i) / n), sum);
         }
     }
 }

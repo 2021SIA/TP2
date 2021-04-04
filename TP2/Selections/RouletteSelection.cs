@@ -24,27 +24,35 @@ namespace TP2.Selections
         {
             var collection = population.ToArray();
             double sum = collection.Sum(c => c.Fitness);
-            return Roulette(collection, selectionSize, (i, c) => c.Fitness, sum);
+            return Roulette(collection, n, selectionSize, (i, c) => c.Fitness, sum);
         }
 
-        protected IEnumerable<Character> Roulette(IEnumerable<Character> population, int selectionSize, Func<int,Character,double> Fitness, double fitnessSum)
+        protected IEnumerable<Character> Roulette(IEnumerable<Character> population, int n, int selectionSize, Func<int,Character,double> Fitness, double fitnessSum)
         {
+            var enumerator = population.GetEnumerator();
+            if (!enumerator.MoveNext())
+                yield break;
+
             var targets = TargetProb(selectionSize).ToArray();
             Array.Sort(targets);
 
             double accum = 0;
-            int i = 1, j = 0;
-            foreach (var c in population)
+            int j = 0;
+            Character c = enumerator.Current;
+            for(int i = 1; i <= n && j < selectionSize;)
             {
-                accum += Fitness(i, c) / fitnessSum;
-                if (accum >= targets[j])
+                accum += Fitness(i, c);
+                if (accum >= targets[j] * fitnessSum)
                 {
                     j++;
                     yield return c;
                 }
-                if (j == selectionSize)
-                    break;
-                i++;
+                else
+                {
+                    i++;
+                    enumerator.MoveNext();
+                    c = enumerator.Current;
+                }
             }
         }
     }
