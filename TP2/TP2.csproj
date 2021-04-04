@@ -5,6 +5,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>1591</NoWarn>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Graphics\**</DefaultItemExcludes>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>

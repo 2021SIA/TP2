@@ -95,8 +95,8 @@ namespace TP2
         {
             switch (replacementName)
             {
-                case "fill all": return new FillAll(n, k);
-                case "fill parent": return new FillParent(n, k);
+                case "fill all": return new FillAll();
+                case "fill parent": return new FillParent();
                 default: throw new Exception("Implementación de reemplazo inválida.");
             }
         }

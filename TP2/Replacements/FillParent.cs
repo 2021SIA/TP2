@@ -9,22 +9,13 @@ namespace TP2.Replacements
 {
     public class FillParent : IReplacement
     {
-        public FillParent(int n, int k)
+        public IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection, int n, int k)
         {
-            N = n;
-            K = k;
-        }
-
-        public int N { get; }
-        public int K { get; }
-
-        public IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection)
-        {
-            if (K > N)
-                return selection.Select(children, K, N);
+            if (k > n)
+                return selection.Select(children, k, n);
             else
             {
-                return children.Concat(selection.Select(population, N, N - K));
+                return children.Concat(selection.Select(population, n, n - k));
             }
         }
     }

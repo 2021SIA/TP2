@@ -8,6 +8,6 @@ namespace TP2.Replacements
 {
     public interface IReplacement
     {
-        IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection);
+        IEnumerable<Character> GetReplacement(IEnumerable<Character> population, IEnumerable<Character> children, ISelection selection, int n, int k);
     }
 }
