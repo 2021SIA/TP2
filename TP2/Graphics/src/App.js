@@ -35,6 +35,7 @@ class App extends React.Component {
     this.storedAvgFitness = [];
     this.storedMinFitness = [];
     this.storedMaxFitness = [];
+	this.storedDiversity = [];
     this.state = {
       config: {
         n: 1000,
@@ -47,7 +48,7 @@ class App extends React.Component {
         b: 0.3,
         crossoverMethod: 'uniform',
         mutationMethod: 'gene',
-        mutationProbability: 0.05,
+        mutationProbability: 0.1,
         replacementMethod: 'fill all',
         characterType: 'warrior',
         finish: 'generations',
@@ -55,9 +56,11 @@ class App extends React.Component {
         tournamentM: 3,
         timeLimit: "",
         targetFitness: "",
-        structurePercentage: ""
+        structurePercentage: "",
+		fitnessUnchanged: "",
+		heightMutationDelta: 0.05
       },
-      series: [{
+      fitnessSeries: [{
         name:"Fitness Promedio",
         data: this.storedAvgFitness
       },{
@@ -67,9 +70,13 @@ class App extends React.Component {
         name:"Fitness Minimo",
         data: this.storedMinFitness
       }],
-      options: {
+	  diversitySeries: [{
+		name: "Diversidad",
+		data: this.storedDiversity
+	  }],
+      fitnessChartOptions: {
         chart: {
-          id: 'realtime',
+          id: 'fitness',
           height: "100%",
           type: 'line',
           animations: {
@@ -109,6 +116,58 @@ class App extends React.Component {
         yaxis: {
           max: 35,
           min: 10,
+          labels: {
+            formatter: function (value) {
+              return value.toFixed(2);
+            }
+          }
+        },
+        legend: {
+          show: true
+        },
+      },
+      diversityChartOptions: {
+        chart: {
+          id: 'diversity',
+          height: "100%",
+          type: 'line',
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 200
+            }
+          },
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        title: {
+          text: 'Diversidad genetica en tiempo real',
+          align: 'center',
+          style: {
+            fontSize:  '30px',
+            fontWeight:  'bold',
+            color: '#263238'
+          }
+        },
+        markers: {
+          size: 0
+        },
+        xaxis: {
+          type: 'numeric',
+          max:500,
+          range:500,
+        },
+        yaxis: {
+          max: 5,
+          min: 0,
           labels: {
             formatter: function (value) {
               return value.toFixed(2);
@@ -219,6 +278,16 @@ class App extends React.Component {
     config.structurePercentage = event.target.value;
     this.setState({ config });
   }
+  handleFitnessUnchangedChange(event){
+    const config = this.state.config;
+    config.fitnessUnchanged = event.target.value;
+    this.setState({ config });
+  }
+  handleHeightMutationDeltaChange(event){
+    const config = this.state.config;
+    config.heightMutationDelta = event.target.value;
+    this.setState({ config });
+  }
   startEngine(){
     const requestOptions = {
         method: 'POST',
@@ -227,7 +296,8 @@ class App extends React.Component {
     this.storedAvgFitness = [];
     this.storedMaxFitness = [];
     this.storedMinFitness = [];
-    ApexCharts.exec('realtime', 'updateOptions', {
+	this.storedDiversity = [];
+    ApexCharts.exec('fitness', 'updateOptions', {
       series: [{
         name:"Fitness Promedio",
         data: this.storedAvgFitness
@@ -238,6 +308,16 @@ class App extends React.Component {
         name:"Fitness Minimo",
         data: this.storedMinFitness
       }],
+      xaxis: {
+        max:500,
+        range:500
+      }
+    },true)
+    ApexCharts.exec('diversity', 'updateOptions', {
+      series: [{
+		name: "Diversidad",
+		data: this.storedDiversity
+	  }],
       xaxis: {
         max:500,
         range:500
@@ -262,11 +342,13 @@ class App extends React.Component {
               const avgFitnessValues = data.map(d => d.avgFitness).reduce((prev,next) => prev.concat(next),[]);
               const maxFitnessValues = data.map(d => d.maxFitness).reduce((prev,next) => prev.concat(next),[]);
               const minFitnessValues = data.map(d => d.minFitness).reduce((prev, next) => prev.concat(next), []);
+			  const diversityValues = data.map(d => d.diversity).reduce((prev, next) => prev.concat(next), []);
               this.setState({ bestCharacter: data[data.length - 1].bestCharacter });
               this.storedAvgFitness = this.storedAvgFitness.concat(avgFitnessValues);
               this.storedMaxFitness = this.storedMaxFitness.concat(maxFitnessValues);
               this.storedMinFitness = this.storedMinFitness.concat(minFitnessValues);
-              ApexCharts.exec('realtime', 'updateSeries', [{
+              this.storedDiversity = this.storedDiversity.concat(diversityValues);
+              ApexCharts.exec('fitness', 'updateSeries', [{
                   name:"Fitness Promedio",
                   data: this.storedAvgFitness
                 },{
@@ -276,14 +358,26 @@ class App extends React.Component {
                   name:"Fitness Minimo",
                   data: this.storedMinFitness
               }],true);
+              ApexCharts.exec('diversity', 'updateSeries', [{
+                  name:"Diversidad",
+                  data: this.storedDiversity
+			  }],true);
               if(this.storedAvgFitness.length >= 500){
-                ApexCharts.exec('realtime', 'updateOptions', {
+                ApexCharts.exec('fitness', 'updateOptions', {
                   xaxis:{
                         max: this.storedAvgFitness.length + 20,
                         range: this.storedAvgFitness.length + 20
                   }
                 },true);
               }
+			  if(this.storedDiversity.length >= 500){
+                ApexCharts.exec('diversity', 'updateOptions', {
+                  xaxis:{
+                        max: this.storedDiversity.length + 20,
+                        range: this.storedDiversity.length + 20
+                  }
+                },true);
+			  }
             }, console.log);
           
         }, 200);
@@ -326,32 +420,7 @@ class App extends React.Component {
                 <input type="numeric" placeholder="B" onChange={(event) => this.handleBChange(event)} value={ this.state.config.b } />
             </div>
         </div>
-        <div className="configuration-row">
-            <div className="configuration-item" >
-                    <label className="configuration-label">Probabilidad de mutacion:</label>
-                    <input type="numeric" placeholder="P" onChange={(event) => this.handleMutationProbabilityChange(event)} value={this.state.config.mutationProbability} />
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Limite de generaciones:</label>
-                <input type="numeric" placeholder="Generaciones" onChange={(event) => this.handleGenLimitChange(event)}  value={ this.state.config.generationsLimit }/>
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Limite de tiempo:</label>
-                <input type="numeric" placeholder="Tiempo" onChange={(event) => this.handleTimeLimitChange(event)}  value={ this.state.config.timeLimit }/>
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Torneo M:</label>
-                <input type="numeric" placeholder="M" onChange={(event) => this.handleTournamentMChange(event)} value={ this.state.config.tournamentM }/>
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Fitness Aceptable:</label>
-                <input type="numeric" placeholder="Fitness" onChange={(event) => this.handleTargetFitnessChange(event)} value={ this.state.config.targetFitness }/>
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Porcentaje Iguales:</label>
-                <input type="numeric" placeholder="P" onChange={(event) => this.handleStructurePercentageChange(event)} value={ this.state.config.structurePercentage }/>
-            </div>
-        </div>
+		
         <div className="configuration-row">
             <div className="configuration-item" >
                 <label className="configuration-label">Cruza:</label>
@@ -437,6 +506,40 @@ class App extends React.Component {
                 </select>
             </div>
         </div>
+        <div className="configuration-row">
+            <div className="configuration-item" >
+                    <label className="configuration-label">Probabilidad de mutacion:</label>
+                    <input type="numeric" placeholder="P" onChange={(event) => this.handleMutationProbabilityChange(event)} value={this.state.config.mutationProbability} />
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Rango Mutación Altura:</label>
+                <input type="numeric" placeholder="delta" onChange={(event) => this.handleHeightMutationDeltaChange(event)} value={ this.state.config.heightMutationDelta }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Limite de generaciones:</label>
+                <input type="numeric" placeholder="Generaciones" onChange={(event) => this.handleGenLimitChange(event)}  value={ this.state.config.generationsLimit }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Limite de tiempo:</label>
+                <input type="numeric" placeholder="Tiempo" onChange={(event) => this.handleTimeLimitChange(event)}  value={ this.state.config.timeLimit }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Torneo M:</label>
+                <input type="numeric" placeholder="M" onChange={(event) => this.handleTournamentMChange(event)} value={ this.state.config.tournamentM }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Fitness Aceptable:</label>
+                <input type="numeric" placeholder="Fitness" onChange={(event) => this.handleTargetFitnessChange(event)} value={ this.state.config.targetFitness }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Porcentaje Iguales:</label>
+                <input type="numeric" placeholder="P" onChange={(event) => this.handleStructurePercentageChange(event)} value={ this.state.config.structurePercentage }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Rango Max. Fitness:</label>
+                <input type="numeric" placeholder="delta" onChange={(event) => this.handleFitnessUnchangedChange(event)} value={ this.state.config.fitnessUnchanged }/>
+            </div>
+        </div>
         {
             !this.state.running && this.state.bestCharacter && 
             <div>
@@ -469,7 +572,10 @@ class App extends React.Component {
             </div>
         }
         <div id="chart" className="chart-container">
-            <ReactApexChart options={this.state.options} series={this.state.series} type="line" height="100%" />
+            <ReactApexChart options={this.state.fitnessChartOptions} series={this.state.fitnessSeries} type="line" height="100%" />
+        </div>
+        <div id="chart" className="chart-container">
+            <ReactApexChart options={this.state.diversityChartOptions} series={this.state.diversitySeries} type="line" height="100%" />
         </div>
       </div>
     );

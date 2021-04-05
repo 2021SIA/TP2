@@ -11,12 +11,14 @@ namespace TP2.Finishers
         private long maxGenerations;
         private int currentRepeatGenerations;
         private double maxFitness;
-        
-        public ContentFinisher(long generations)
+        private double fitnessEpsilon;
+
+        public ContentFinisher(long generations, double fitnessEpsilon)
         {
             this.currentRepeatGenerations = 0;
             this.maxGenerations = generations;
             this.maxFitness = 0;
+            this.fitnessEpsilon = fitnessEpsilon;
         }
 
         public bool IsFinished(IEnumerable<Character> population, long generations, long time)
@@ -36,7 +38,7 @@ namespace TP2.Finishers
                 if(character.Fitness > currMaxFitness)
                     currMaxFitness = character.Fitness;
             }
-            if(currMaxFitness > this.maxFitness)
+            if(currMaxFitness - this.maxFitness > fitnessEpsilon)
             {
                 this.maxFitness = currMaxFitness;
                 return false;

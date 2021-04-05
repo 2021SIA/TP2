@@ -15,7 +15,8 @@ namespace TP2.Genes
 
         public IGene Mutate()
         {
-            double height = (rnd.NextDouble() >= 0.5 ? Value + Delta : Value - Delta);
+            double d = rnd.NextDouble() * Delta;
+            double height = (rnd.NextDouble() >= 0.5 ? Value + d : Value - d);
             height = Math.Clamp(height, MinHeight, MaxHeight);
             return new HeightGene(height);
         }

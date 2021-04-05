@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using TP2.Crossovers;
 using TP2.Finishers;
+using TP2.Genes;
 using TP2.Models;
 using TP2.Mutations;
 using TP2.Replacements;
@@ -40,6 +41,8 @@ namespace TP2
             public double? TargetFitness { get; set; } = null;
             public double? StructurePercentage { get; set; } = null;
             public int? TournamentM { get; set; } = null;
+            public double? FitnessUnchanged { get; set; } = null;
+            public double? HeightMutationDelta { get; set; } = null;
         }
         public ISelection Method1 { get; }
         public ISelection Method2 { get; }
@@ -107,8 +110,8 @@ namespace TP2
                 case "time": return new TimeFinisher(configFile.TimeLimit.Value);
                 case "generations": return new GenerationFinisher(configFile.GenerationsLimit.Value);
                 case "acceptable solution": return new SolutionFinisher(configFile.TargetFitness.Value);
-                case "structure": return new StructureFinisher(configFile.StructurePercentage.Value);
-                case "content": return new ContentFinisher(configFile.GenerationsLimit.Value);
+                case "structure": return new StructureFinisher(configFile.StructurePercentage.Value,configFile.GenerationsLimit.Value);
+                case "content": return new ContentFinisher(configFile.GenerationsLimit.Value,configFile.FitnessUnchanged.Value);
                 default: throw new Exception("Condicion de corte inválida.");
             }
         }
@@ -134,6 +137,10 @@ namespace TP2
             IReplacement replacement = GetReplacement(configFile.ReplacementMethod, configFile.N, configFile.K);
             Character.Type type = GetCharacterType(configFile.CharacterType);
             IFinisher finisher = GetFinisher(configFile.Finish, configFile);
+            if (configFile.HeightMutationDelta.HasValue)
+            {
+                HeightGene.Delta = configFile.HeightMutationDelta.Value;
+            }
             return new Configuration(configFile.N, configFile.K, configFile.A, configFile.B, method1, method2, method3, method4,
                 crossover, mutation, configFile.MutationProbability, replacement, finisher, type);
         }

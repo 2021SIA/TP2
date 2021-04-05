@@ -128,7 +128,7 @@ namespace TP2.Models
             {
                 return false;
             }
-            return this.Height == other.Height && 
+            return Math.Abs(this.Height - other.Height) < 0.01 && 
                 this.Helmet.Equals(other.Helmet) && 
                 this.Chest.Equals(other.Chest) && 
                 this.Weapon.Equals(other.Weapon) && 

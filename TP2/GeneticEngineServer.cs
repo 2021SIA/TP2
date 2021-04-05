@@ -25,6 +25,8 @@ namespace TP2
 
             public double MaxFitness { get; set; }
 
+            public double Diversity { get; set; }
+
             public Character BestCharacter { get; set; }
             public GenerationMetrics() { }
         }
@@ -41,19 +43,24 @@ namespace TP2
         {
             double avgFitness = 0, minFitness = double.MaxValue, maxFitness = 0;
             Character bestCharacter = generation.First();
-            foreach(Character c in generation)
+            IDictionary<Character, int> equalGroups = new Dictionary<Character, int>();
+            int generationSize = generation.Count();
+            foreach (Character c in generation)
             {
                 avgFitness += c.Fitness;
                 minFitness = c.Fitness < minFitness ? c.Fitness : minFitness;
                 maxFitness = c.Fitness > maxFitness ? c.Fitness : maxFitness;
                 bestCharacter = c.Fitness > bestCharacter.Fitness ? c : bestCharacter;
+                equalGroups[c] = equalGroups.ContainsKey(c) ? equalGroups[c] + 1 : 1;
             }
-            avgFitness /= generation.Count();
+            avgFitness /= generationSize;
+            double diversity = equalGroups.Aggregate(0.0,(total,g) => total + (-g.Value / (double)generationSize) * Math.Log2(g.Value / (double)generationSize));
             metricsBuffer.Post(new GenerationMetrics() { 
                 AvgFitness = avgFitness,
                 MinFitness = minFitness,
                 MaxFitness = maxFitness,
-                BestCharacter = bestCharacter
+                BestCharacter = bestCharacter,
+                Diversity = diversity
             });
         }
         public async Task HandleIncomingConnections()
