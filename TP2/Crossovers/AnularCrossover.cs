@@ -24,7 +24,7 @@ namespace TP2.Crossovers
                 genes1[position] = i < l ? c1.Genes[position] : c2.Genes[position];
                 genes2[position] = i < l ? c2.Genes[position] : c1.Genes[position];
             }
-            return new Character[] { new Character(genes1), new Character(genes2) };
+            return new Character[] { new Character(c1.CharacterType,genes1), new Character(c2.CharacterType, genes2) };
         }
     }
 }

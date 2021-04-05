@@ -169,6 +169,11 @@ class App extends React.Component {
     config.method4 = event.target.value;
     this.setState({ config });
   }
+  handleReplacementChange(event) {
+    const config = this.state.config;
+    config.replacement = event.target.value;
+    this.setState({ config });
+  }
   handleMutationChange(event) {
     const config = this.state.config;
     config.mutationMethod = event.target.value;
@@ -244,7 +249,9 @@ class App extends React.Component {
           fetch('http://localhost:5000/data')
             .then(response => response.json())
             .then(data => {
-              if(!data || data.length === 0 || (data.length > 0 && data[data.length - 1] === null)){
+			  if(!data || data.length === 0)
+				return;
+              if(data.length > 0 && data[data.length - 1] === null){
                   window.clearInterval(intervalId);
                   this.setState({ running: false });
                 if(data.length <= 1) 
@@ -433,7 +440,10 @@ class App extends React.Component {
         {
             !this.state.running && this.state.bestCharacter && 
             <div>
-                <h1 style={{ marginTop: 0 }} >Mejor Personaje</h1>
+                <h1 style={{ marginTop: 0,marginBottom: 0 }} >Mejor Personaje</h1>
+				<div style={{display:'flex',marginTop: 14 + 'px',marginBottom: 14 + 'px',justifyContent:'center'}}>
+					<b>ALTURA: </b>{this.state.bestCharacter.height.toFixed(2)} <br />
+				</div>
                 <div id="character-data" className="character-data">
                     <div id="helmet-data" className="character-item">
                         CASCO <br />

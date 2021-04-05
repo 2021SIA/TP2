@@ -20,7 +20,7 @@ namespace TP2.Mutations
                 genes[p] = genes[p].Mutate();
             }
 
-            return new Character(genes);
+            return new Character(c.CharacterType, genes);
         }
     }
 }

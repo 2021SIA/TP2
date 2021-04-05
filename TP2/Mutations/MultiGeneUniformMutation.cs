@@ -16,7 +16,7 @@ namespace TP2.Mutations
             {
                 genes[i] = rnd.NextDouble() < probability ? c.Genes[i].Mutate() : c.Genes[i];
             }
-            return new Character(genes);
+            return new Character(c.CharacterType, genes);
         }
     }
 }

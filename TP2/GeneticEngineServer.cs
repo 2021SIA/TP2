@@ -92,7 +92,7 @@ namespace TP2
                     {
                         Configuration config = Configuration.FromJson(jsonConfiguration);
                         GeneticEngine engine = new GeneticEngine(config);
-                        var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
+                        var population = Enumerable.Range(0, engine.N).Select(_ => new Character(config.CharacterType));
                         var engineThread = new Thread(() =>
                         {
                             metricsBuffer = new BufferBlock<GenerationMetrics>();

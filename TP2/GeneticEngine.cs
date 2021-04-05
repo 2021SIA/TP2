@@ -10,6 +10,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
+using TP2.Genes;
 
 namespace TP2
 {
@@ -143,7 +144,7 @@ namespace TP2
                     return;
                 }
                 var engine = new GeneticEngine(configuration);
-                var population = Enumerable.Range(0, engine.N).Select(_ => new Character());
+                var population = Enumerable.Range(0, engine.N).Select(_ => new Character(configuration.CharacterType));
                 var initialScore = population.Sum(c => c.Fitness);
                 Console.WriteLine($"Initial score: {initialScore}");
                 var evolved = engine.UntilFinish(population);

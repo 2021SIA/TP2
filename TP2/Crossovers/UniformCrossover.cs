@@ -24,7 +24,7 @@ namespace TP2.Crossovers
                 genes1[i] = flip == 0 ? c1.Genes[i] : c2.Genes[i];
                 genes2[i] = flip == 0 ? c2.Genes[i] : c1.Genes[i];
             }
-            return new Character[] { new Character(genes1), new Character(genes2) };
+            return new Character[] { new Character(c1.CharacterType, genes1), new Character(c2.CharacterType, genes2) };
         }
     }
 }

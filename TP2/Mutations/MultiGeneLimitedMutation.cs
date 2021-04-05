@@ -33,7 +33,7 @@ namespace TP2.Mutations
                 if (rnd.NextDouble() < probability)
                     genes[index] = c.Genes[index].Mutate();
             }
-            return new Character(genes);
+            return new Character(c.CharacterType, genes);
         }
     }
 }

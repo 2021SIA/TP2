@@ -26,7 +26,7 @@ namespace TP2.Crossovers
             c1.Genes[p2..].CopyTo(genes1.AsSpan(p2));
             c2.Genes[p2..].CopyTo(genes2.AsSpan(p2));
 
-            return new Character[] { new Character(genes1), new Character(genes2) };
+            return new Character[] { new Character(c1.CharacterType, genes1), new Character(c2.CharacterType, genes2) };
         }
     }
 }

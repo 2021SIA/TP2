@@ -24,7 +24,7 @@ namespace TP2.Mutations
 
             }
 
-            return new Character(genes);
+            return new Character(c.CharacterType,genes);
         }
     }
 }

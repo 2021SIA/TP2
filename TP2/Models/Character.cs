@@ -37,8 +37,9 @@ namespace TP2.Models
         private ItemGene boots;
         public Item Boots { get => boots.Value; }
 
-        public Character()
+        public Character(Type characterType)
         {
+            this.CharacterType = characterType;
             height = HeightGene.Random();
             helmet = ItemGene.Random(Item.Type.HELMET);
             chest = ItemGene.Random(Item.Type.CHEST);
@@ -49,8 +50,9 @@ namespace TP2.Models
             genes = new IGene[] { height, helmet, chest, gloves, weapon, boots };
         }
 
-        public Character(IGene[] genes)
+        public Character(Type characterType,IGene[] genes)
         {
+            this.CharacterType = characterType;
             this.genes = genes;
 
             height = (HeightGene)genes[0];
