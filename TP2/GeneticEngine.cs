@@ -53,7 +53,7 @@ namespace TP2
             {
                 Character c1 = iter.Current;
                 iter.MoveNext();
-                Character c2 = iter.Current;
+                Character c2 = iter.Current != null ? iter.Current : c1;
                 yield return (c1, c2);
             }
         }

@@ -58,7 +58,10 @@ class App extends React.Component {
         targetFitness: "",
         structurePercentage: "",
 		fitnessUnchanged: "",
-		heightMutationDelta: 0.05
+		heightMutationDelta: 0.05,
+		boltzmannK:"",
+		boltzmannT0:"",
+		boltzmannTc:"",
       },
       fitnessSeries: [{
         name:"Fitness Promedio",
@@ -288,6 +291,21 @@ class App extends React.Component {
     config.heightMutationDelta = event.target.value;
     this.setState({ config });
   }
+  handleBoltzmannKChange(event){
+    const config = this.state.config;
+    config.boltzmannK = event.target.value;
+    this.setState({ config });
+  }
+  handleBoltzmannTcChange(event){
+    const config = this.state.config;
+    config.boltzmannTc = event.target.value;
+    this.setState({ config });
+  }
+  handleBoltzmannT0Change(event){
+    const config = this.state.config;
+    config.boltzmannT0 = event.target.value;
+    this.setState({ config });
+  }
   startEngine(){
     const requestOptions = {
         method: 'POST',
@@ -508,12 +526,12 @@ class App extends React.Component {
         </div>
         <div className="configuration-row">
             <div className="configuration-item" >
-                    <label className="configuration-label">Probabilidad de mutacion:</label>
-                    <input type="numeric" placeholder="P" onChange={(event) => this.handleMutationProbabilityChange(event)} value={this.state.config.mutationProbability} />
-            </div>
-            <div className="configuration-item" >
                 <label className="configuration-label">Rango Mutación Altura:</label>
                 <input type="numeric" placeholder="delta" onChange={(event) => this.handleHeightMutationDeltaChange(event)} value={ this.state.config.heightMutationDelta }/>
+            </div>
+            <div className="configuration-item" >
+				<label className="configuration-label">Probabilidad de mutacion:</label>
+				<input type="numeric" placeholder="P" onChange={(event) => this.handleMutationProbabilityChange(event)} value={this.state.config.mutationProbability} />
             </div>
             <div className="configuration-item" >
                 <label className="configuration-label">Limite de generaciones:</label>
@@ -522,10 +540,6 @@ class App extends React.Component {
             <div className="configuration-item" >
                 <label className="configuration-label">Limite de tiempo:</label>
                 <input type="numeric" placeholder="Tiempo" onChange={(event) => this.handleTimeLimitChange(event)}  value={ this.state.config.timeLimit }/>
-            </div>
-            <div className="configuration-item" >
-                <label className="configuration-label">Torneo M:</label>
-                <input type="numeric" placeholder="M" onChange={(event) => this.handleTournamentMChange(event)} value={ this.state.config.tournamentM }/>
             </div>
             <div className="configuration-item" >
                 <label className="configuration-label">Fitness Aceptable:</label>
@@ -538,6 +552,24 @@ class App extends React.Component {
             <div className="configuration-item" >
                 <label className="configuration-label">Rango Max. Fitness:</label>
                 <input type="numeric" placeholder="delta" onChange={(event) => this.handleFitnessUnchangedChange(event)} value={ this.state.config.fitnessUnchanged }/>
+            </div>
+        </div>
+        <div className="configuration-row">
+            <div className="configuration-item" >
+                <label className="configuration-label">Boltzmann Tc:</label>
+                <input type="numeric" placeholder="delta" onChange={(event) => this.handleBoltzmannTcChange(event)} value={ this.state.config.boltzmannTc }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Boltzmann T0:</label>
+                <input type="numeric" placeholder="delta" onChange={(event) => this.handleBoltzmannT0Change(event)} value={ this.state.config.boltzmannT0 }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Boltzmann K:</label>
+                <input type="numeric" placeholder="delta" onChange={(event) => this.handleBoltzmannKChange(event)} value={ this.state.config.boltzmannK }/>
+            </div>
+            <div className="configuration-item" >
+                <label className="configuration-label">Torneo M:</label>
+                <input type="numeric" placeholder="M" onChange={(event) => this.handleTournamentMChange(event)} value={ this.state.config.tournamentM }/>
             </div>
         </div>
         {

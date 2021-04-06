@@ -43,6 +43,9 @@ namespace TP2
             public int? TournamentM { get; set; } = null;
             public double? FitnessUnchanged { get; set; } = null;
             public double? HeightMutationDelta { get; set; } = null;
+            public double? BoltzmannTc { get; set; } = null;
+            public double? BoltzmannT0 { get; set; } = null;
+            public double? BoltzmannK { get; set; } = null;
         }
         public ISelection Method1 { get; }
         public ISelection Method2 { get; }
@@ -65,7 +68,7 @@ namespace TP2
                 case "elite": return new EliteSelection();
                 case "roulette": return new RouletteSelection();
                 case "ranking": return new RankingSelection();
-                case "boltzmann": return new BoltzmannSelection();
+                case "boltzmann": return new BoltzmannSelection(configFile.BoltzmannK.Value,configFile.BoltzmannTc.Value, configFile.BoltzmannT0.Value);
                 case "tournament det": return new TournamentDetSelection(configFile.TournamentM.Value);
                 case "tournament prob": return new TournamentProbSelection();
                 case "universal": return new UniversalSelection();

@@ -8,27 +8,31 @@ namespace TP2.Selections
 {
     public class BoltzmannSelection : RouletteSelection
     {
-        public BoltzmannSelection()
+        private int cantGen;
+        private double k = 1;
+        private double Tc = 1;
+        private double T0 = 10;
+        public BoltzmannSelection(double k, double Tc, double T0)
         {
             this.cantGen = 0;
+            this.k = k;
+            this.Tc = Tc;
+            this.T0 = T0;
         }
-        private int cantGen;
 
         public override IEnumerable<Character> Select(IEnumerable<Character> population, int n, int selectionSize)
         {
             var collection = population.ToArray();
             double temp = functionTemp();
-            double sum = collection.Sum(character => Math.Exp(character.Fitness / temp));
-            var filter = Roulette(collection, n, selectionSize, (i, character) => Math.Exp(character.Fitness / temp), sum);
+            double avgExpFitness = collection.Average(character => Math.Exp(character.Fitness / temp));
+            double sum = collection.Sum(character => Math.Exp(character.Fitness / temp) / avgExpFitness);
+            var filter = Roulette(collection, n, selectionSize, (i, character) => Math.Exp(character.Fitness / temp) / avgExpFitness, sum);
             cantGen++;
             return filter;
         }
 
         private double functionTemp()
         {
-            double k = 1;
-            double Tc = 1;
-            double T0 = 10;
             return Tc + (T0 - Tc)*Math.Exp(-k*this.cantGen);
         }
     }
