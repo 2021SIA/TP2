@@ -28,7 +28,7 @@ Usage:
 
 Options:
   --config <config>      Configuration yaml file path
-  --dataset <dataset>    Path to database directory
+  --dataset <dataset>    Path to dataset directory
   --listen               Flag to run engine as web server
   --version              Show version information
   -?, -h, --help         Show help and usage information
@@ -54,10 +54,10 @@ a: <A value>
 b: <B value>
 crossoverMethod: <one point|two point|anular|uniform>
 mutationMethod: <gene|multigene limited|multigene uniform|complete>
-mutationProbability: <mutation probability>,
-replacementMethod: <fill all|fill parent>,
-characterType: <warrior|archer|defender|rogue>,
-finish: <time|generations|acceptable solution|structure|content>,
+mutationProbability: <mutation probability>
+replacementMethod: <fill all|fill parent>
+characterType: <warrior|archer|defender|rogue>
+finish: <time|generations|acceptable solution|structure|content>
 generationsLimit: <generation limit> (only with finish='generations','structure','content')
 tournamentM: <tournament M value> (only with selection method='tournament det','torunament prob')
 timeLimit: <time limit> (only with finish='time')
@@ -84,7 +84,7 @@ npm start
 ```
 Note: Node version must be v12
 
-Once the application installs and starts, it can be used in a web browser at http://localhost:3000
+Once the application installs and starts, it can be used in a web browser at http://localhost:3000.
 
 
 
